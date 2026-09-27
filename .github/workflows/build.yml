@@ -17,7 +17,7 @@ jobs:
       - name: Extract project
         run: |
           mkdir project
-          unzip -q ReplyMateAI-project.zip -d project
+          unzip -q ReplyMateAI-v1.1.zip -d project
 
       - name: Setup Java
         uses: actions/setup-java@v5
