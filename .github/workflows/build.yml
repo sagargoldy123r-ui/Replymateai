@@ -11,31 +11,33 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v6
+
+      - name: Check ZIP file
+        run: |
+          echo "Files in repository:"
+          ls -lah
+          echo ""
+          echo "Checking ReplyMateAI-v1.1.zip..."
+          test -f ReplyMateAI-v1.1.zip
+          echo "ZIP file found successfully."
 
       - name: Extract project
         run: |
-          mkdir project
+          mkdir -p project
           unzip -q ReplyMateAI-v1.1.zip -d project
 
-      - name: Setup Java
-        uses: actions/setup-java@v5
-        with:
-          distribution: temurin
-          java-version: '17'
+          echo "Extracted files:"
+          find project -maxdepth 5 -type f | head -100
 
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v6
-        with:
-          gradle-version: '8.10'
+      - name: Detect project folder
+        run: |
+          echo "Searching for Gradle project..."
 
-      - name: Build APK
-        working-directory: project
-        run: gradle assembleDebug
-
-      - name: Upload APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: ReplyMateAI-debug
-          path: project/app/build/outputs/apk/debug/app-debug.apk
+          if [ -f "project/settings.gradle" ] || [ -f "project/settings.gradle.kts" ]; then
+            echo "Gradle project found directly in project/"
+          elif [ -f "project/ReplyMateAI-v1.1/settings.gradle" ] || [ -f "project/ReplyMateAI-v1.1/settings.gradle.kts" ]; then
+            echo "Gradle project found inside project/ReplyMateAI-v1.1/"
+            mv project/ReplyMateAI-v1.1/* project/
+            mv project/Reply
