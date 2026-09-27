@@ -1,0 +1,38 @@
+name: Build ReplyMate AI APK
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Extract project
+        run: |
+          mkdir project
+          unzip -q ReplyMateAI-project.zip -d project
+
+      - name: Setup Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v6
+        with:
+          gradle-version: '8.10'
+
+      - name: Build APK
+        working-directory: project
+        run: gradle assembleDebug
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: ReplyMateAI-debug
+          path: project/app/build/outputs/apk/debug/app-debug.apk
